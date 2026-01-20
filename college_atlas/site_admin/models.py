@@ -60,8 +60,8 @@ class College(TimeStampedModel):
         ('other', 'Other'),
     )
 
-    name = models.CharField(max_length=255)
-    university = models.CharField(max_length=255, blank=True, null=True, help_text="Name of affiliated university")
+    name = models.CharField(max_length=500)
+    university = models.CharField(max_length=500, blank=True, null=True, help_text="Name of affiliated university")
     college_type = models.CharField(max_length=10, choices=COLLEGE_TYPES, default=COLLEGE_TYPES[0][0])
     
     district = models.ForeignKey(District, on_delete=models.PROTECT, related_name='colleges')
@@ -90,7 +90,7 @@ class College(TimeStampedModel):
     )
 
     image = models.ImageField(upload_to='college_images', blank=True, null=True)
-    image_url = models.URLField(blank=True, null=True, help_text="External image URL (used if image is not uploaded)")
+    image_url = models.URLField(max_length=500, blank=True, null=True, help_text="External image URL (used if image is not uploaded)")
 
     class Meta:
         verbose_name_plural = "Colleges"
