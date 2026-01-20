@@ -10,10 +10,12 @@ def home(request):
     """
     states = State.objects.all()
     countries = Country.objects.all()
+    college_count = College.objects.count()
     
     context = {
         'states': states,
         'countries': countries,
+        'college_count': college_count,
     }
     return render(request, 'public/home.html', context)
 
