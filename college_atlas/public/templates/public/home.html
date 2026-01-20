@@ -1,0 +1,108 @@
+{% extends 'public/base.html' %}
+
+{% block title %}College Discovery Home{% endblock %}
+
+{% block header_search %}
+{% endblock %}
+
+{% block content %}
+<main class="flex-1 flex flex-col items-center">
+    <section class="w-full">
+        <div class="@container">
+            <div class="flex min-h-[500px] flex-col gap-6 bg-cover bg-center bg-no-repeat items-center justify-center p-4 relative"
+                style='background-image: linear-gradient(rgba(16, 23, 34, 0.6) 0%, rgba(16, 23, 34, 0.7) 100%), url("https://lh3.googleusercontent.com/aida-public/AB6AXuD62A-X997UBW8f40TOt0YVNwwV7J3wnwfwTZ8yp-tHYVt7b1Dm85n_jwnLJZACJ-0yq1Hw2Ghf7DVxoIekY-zW-rT0xjvhWsZG-I8DEedzD4wJD0HhXu2WdU7xr3zbbEJrl5s_4ZCT_nrtBGC7KSxkOrI19ecM0O1M-kY_lt0h3ztltbF6KLvcAI3F8u9nM9w4wF7NMtCn2uRY7PZDcd18zUEJvRL3QT5iEYELI-dGOhwvcMszmxSlvxaMW5tNe7025wfiyTFMrQ");'>
+                <div class="flex flex-col gap-4 text-center max-w-[800px]">
+                    <h1
+                        class="text-white text-4xl font-black leading-tight tracking-[-0.033em] md:text-5xl lg:text-6xl drop-shadow-sm">
+                        Find Your Future
+                    </h1>
+                    <h2
+                        class="text-slate-200 text-base font-medium leading-normal md:text-lg lg:text-xl drop-shadow-sm">
+                        The Premium Path to Higher Education. Discover over 5,000 listed colleges.
+                    </h2>
+                </div>
+                <form action="{% url 'filter_college' %}" method="GET"
+                    class="w-full max-w-[600px] mt-4 shadow-2xl rounded-lg">
+                    <label class="flex flex-col w-full h-14 md:h-16">
+                        <div
+                            class="flex w-full flex-1 items-stretch rounded-lg h-full bg-white dark:bg-slate-800 overflow-hidden border border-slate-200 dark:border-slate-700 focus-within:ring-2 focus-within:ring-primary focus-within:border-primary transition-all">
+                            <div class="text-slate-400 flex items-center justify-center pl-4 pr-2">
+                                <span class="material-symbols-outlined">search</span>
+                            </div>
+                            <input name="q"
+                                class="flex w-full min-w-0 flex-1 bg-transparent text-slate-900 dark:text-white placeholder:text-slate-400 px-2 text-base outline-none border-none focus:ring-0 h-full"
+                                placeholder="Search by college name, city, or major..." />
+                            <div class="flex items-center justify-center pr-2">
+                                <button type="submit"
+                                    class="flex items-center justify-center overflow-hidden rounded-md h-10 px-6 bg-primary hover:bg-primary-dark text-white text-sm font-bold transition-colors">
+                                    Search
+                                </button>
+                            </div>
+                        </div>
+                    </label>
+                </form>
+            </div>
+        </div>
+    </section>
+    <div class="w-full max-w-[1200px] px-4 md:px-10 lg:px-40 py-20">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
+            <div
+                class="group relative overflow-hidden rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-8 md:p-10 shadow-sm hover:shadow-xl transition-all duration-300">
+                <div class="relative z-10 h-full flex flex-col items-start">
+                    <div class="mb-6 flex items-center justify-center w-14 h-14 rounded-xl bg-primary/10 text-primary">
+                        <span class="material-symbols-outlined text-3xl">map</span>
+                    </div>
+                    <h3 class="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white mb-4 leading-tight">
+                        Search via <br />Interactive Map
+                    </h3>
+                    <p class="text-slate-600 dark:text-slate-400 text-base leading-relaxed mb-8 max-w-sm">
+                        Visualize your academic journey. Explore campuses geographically and filter by
+                        proximity, urban settings, or regional features.
+                    </p>
+                    <button onclick="window.location.href='{% url 'map_search' %}';"
+                        class="mt-auto flex items-center gap-2 text-primary font-bold hover:gap-3 transition-all">
+                        Explore the Map
+                        <span class="material-symbols-outlined">arrow_forward</span>
+                    </button>
+                </div>
+                <div
+                    class="absolute -right-12 -bottom-12 opacity-[0.03] dark:opacity-[0.05] pointer-events-none transition-transform group-hover:scale-110">
+                    <span class="material-symbols-outlined text-[240px]">explore</span>
+                </div>
+            </div>
+            <div
+                class="group relative overflow-hidden rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-8 md:p-10 shadow-sm hover:shadow-xl transition-all duration-300">
+                <div class="relative z-10 h-full flex flex-col items-start">
+                    <div class="mb-6 flex items-center justify-center w-14 h-14 rounded-xl bg-primary/10 text-primary">
+                        <span class="material-symbols-outlined text-3xl">location_city</span>
+                    </div>
+                    <h3 class="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white mb-4 leading-tight">
+                        Browse by <br />Location
+                    </h3>
+                    <p class="text-slate-600 dark:text-slate-400 text-base leading-relaxed mb-8 max-w-sm">
+                        Narrow down your search by Country, State, or District. Find the best institutions
+                        within your preferred territories.
+                    </p>
+                    <div class="flex flex-wrap gap-2 mt-auto">
+                        <span
+                            class="px-3 py-1 bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 rounded-full text-xs font-semibold">Country</span>
+                        <span
+                            class="px-3 py-1 bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 rounded-full text-xs font-semibold">State</span>
+                        <span
+                            class="px-3 py-1 bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 rounded-full text-xs font-semibold">District</span>
+                    </div>
+                    <button onclick="window.location.href='{% url 'filter_college' %}';"
+                        class="mt-6 flex items-center gap-2 text-primary font-bold hover:gap-3 transition-all">
+                        Filter by Territory
+                        <span class="material-symbols-outlined">arrow_forward</span>
+                    </button>
+                </div>
+                <div
+                    class="absolute -right-12 -bottom-12 opacity-[0.03] dark:opacity-[0.05] pointer-events-none transition-transform group-hover:scale-110">
+                    <span class="material-symbols-outlined text-[240px]">public</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+{% endblock %}

@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+{% load static %}
+<html class="light" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>{% if is_edit %}Edit{% else %}Create{% endif %} Degree | CollegeFinder</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@200..800&amp;family=Inter:wght@100..900&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#2563eb",
+                        "navy": {
+                            "900": "#0f172a",
+                            "800": "#1e293b",
+                            "700": "#334155"
+                        },
+                        "background": "#f8fafc",
+                    },
+                    fontFamily: {
+                        "sans": ["Inter", "sans-serif"],
+                        "display": ["Plus Jakarta Sans", "sans-serif"]
+                    },
+                },
+            },
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer base {
+            body { @apply font-sans text-slate-900 bg-background; }
+        }
+        .material-symbols-outlined { 
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .form-input { @apply w-full rounded-lg border-slate-200 bg-white px-4 py-2.5 text-sm focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all placeholder:text-slate-400; }
+        .form-label { @apply block text-sm font-semibold text-slate-700 mb-1.5; }
+        .card-container { @apply bg-white rounded-xl border border-slate-200 shadow-card; }
+    </style>
+</head>
+
+<body class="min-h-screen">
+    <div class="flex min-h-screen">
+        <div class="flex-1 flex flex-col min-w-0 bg-background">
+            <header
+                class="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-8 sticky top-0 z-30">
+                <div class="flex items-center gap-3 text-sm">
+                    <a class="text-slate-500 hover:text-primary transition-colors" href="{% url 'admin_dashboard' %}">Admin</a>
+                    <span class="material-symbols-outlined text-slate-300 text-lg">chevron_right</span>
+                    <a class="text-slate-500 hover:text-primary transition-colors" href="{% url 'degree_list' %}">Degrees</a>
+                    <span class="material-symbols-outlined text-slate-300 text-lg">chevron_right</span>
+                    <span class="text-slate-900 font-semibold">{% if is_edit %}Edit{% else %}Create{% endif %}</span>
+                </div>
+            </header>
+            <main class="p-8 max-w-3xl w-full mx-auto">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+                    <div>
+                        <h1 class="text-2xl font-extrabold text-slate-900 tracking-tight">{% if is_edit %}Edit{% else %}Create New{% endif %} Degree</h1>
+                        <p class="text-slate-500 text-sm mt-1">{% if is_edit %}Update degree information{% else %}Add a new academic degree program{% endif %}.</p>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <a href="{% url 'degree_list' %}"
+                            class="px-5 py-2.5 text-sm font-semibold text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-all">
+                            Cancel
+                        </a>
+                        <button type="submit" form="degreeForm"
+                            class="px-6 py-2.5 text-sm font-semibold text-white bg-primary rounded-lg hover:bg-blue-700 shadow-md shadow-primary/20 transition-all flex items-center gap-2">
+                            <span class="material-symbols-outlined text-lg">save</span>
+                            Save Degree
+                        </button>
+                    </div>
+                </div>
+                <form id="degreeForm" method="post">
+                    {% csrf_token %}
+                    <div class="card-container">
+                        <div class="px-6 py-4 border-b border-slate-100 bg-slate-50/50 rounded-t-xl">
+                            <h3 class="text-base font-bold text-slate-800">Degree Information</h3>
+                            <p class="text-xs text-slate-500">Basic details about the degree program</p>
+                        </div>
+                        <div class="p-6 space-y-6">
+                            <div>
+                                <label class="form-label">Degree Name</label>
+                                <input name="name" value="{% if degree %}{{ degree.name }}{% endif %}" class="form-input" placeholder="e.g. B.E. Computer Science" type="text" required />
+                                <p class="text-xs text-slate-500 mt-1">Full name of the degree program</p>
+                            </div>
+                            <div>
+                                <label class="form-label">Duration (Years)</label>
+                                <input name="duration_years" value="{% if degree %}{{ degree.duration_years }}{% else %}4{% endif %}" class="form-input" placeholder="4" type="number" min="1" max="10" required />
+                                <p class="text-xs text-slate-500 mt-1">Number of years to complete the degree</p>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </main>
+        </div>
+    </div>
+</body>
+
+</html>

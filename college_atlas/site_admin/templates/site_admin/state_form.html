@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+{% load static %}
+<html class="light" lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>{% if is_edit %}Edit{% else %}Create{% endif %} State | CollegeFinder</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@200..800&amp;family=Inter:wght@100..900&amp;display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet" />
+    <style type="text/tailwindcss">
+        @layer base { body { @apply font-sans text-slate-900 bg-slate-50; } }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .form-input { @apply w-full rounded-lg border-slate-200 bg-white px-4 py-2.5 text-sm focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10 transition-all placeholder:text-slate-400; }
+        .form-label { @apply block text-sm font-semibold text-slate-700 mb-1.5; }
+    </style>
+</head>
+<body class="min-h-screen">
+    <div class="flex-1 flex flex-col min-w-0 bg-slate-50">
+        <header class="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-8 sticky top-0 z-30">
+            <div class="flex items-center gap-3 text-sm">
+                <a class="text-slate-500 hover:text-blue-600 transition-colors" href="{% url 'admin_dashboard' %}">Admin</a>
+                <span class="material-symbols-outlined text-slate-300 text-lg">chevron_right</span>
+                <a class="text-slate-500 hover:text-blue-600 transition-colors" href="{% url 'state_list' %}">States</a>
+                <span class="material-symbols-outlined text-slate-300 text-lg">chevron_right</span>
+                <span class="text-slate-900 font-semibold">{% if is_edit %}Edit{% else %}Create{% endif %}</span>
+            </div>
+        </header>
+        <main class="p-8 max-w-3xl w-full mx-auto">
+            <div class="flex items-center justify-between gap-4 mb-8">
+                <div>
+                    <h1 class="text-2xl font-extrabold text-slate-900 tracking-tight">{% if is_edit %}Edit{% else %}Create New{% endif %} State</h1>
+                    <p class="text-slate-500 text-sm mt-1">{% if is_edit %}Update state information{% else %}Add a new state/province{% endif %}.</p>
+                </div>
+                <div class="flex items-center gap-3">
+                    <a href="{% url 'state_list' %}" class="px-5 py-2.5 text-sm font-semibold text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-all">Cancel</a>
+                    <button type="submit" form="stateForm" class="px-6 py-2.5 text-sm font-semibold text-white bg-blue-600 rounded-lg hover:bg-blue-700 shadow-md shadow-blue-600/20 transition-all flex items-center gap-2">
+                        <span class="material-symbols-outlined text-lg">save</span>
+                        Save State
+                    </button>
+                </div>
+            </div>
+            <form id="stateForm" method="post" class="bg-white rounded-xl border border-slate-200 shadow-sm">
+                {% csrf_token %}
+                <div class="px-6 py-4 border-b border-slate-100 bg-slate-50/50 rounded-t-xl">
+                    <h3 class="text-base font-bold text-slate-800">State Information</h3>
+                </div>
+                <div class="p-6 space-y-6">
+                    <div>
+                        <label class="form-label">State Name</label>
+                        <input name="name" value="{% if state %}{{ state.name }}{% endif %}" class="form-input" placeholder="e.g. Tamil Nadu" type="text" required />
+                    </div>
+                    <div>
+                        <label class="form-label">Country</label>
+                        <select name="country" class="form-input" required>
+                            <option value="">Select Country</option>
+                            {% for country in countries %}
+                            <option value="{{ country.id }}" {% if state and state.country.id == country.id %}selected{% endif %}>{{ country.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+            </form>
+        </main>
+    </div>
+</body>
+</html>

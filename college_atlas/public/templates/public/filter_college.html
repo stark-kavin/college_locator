@@ -1,0 +1,310 @@
+{% extends 'public/base.html' %}
+
+{% block title %}CollegeSeeker - Browse Locations{% endblock %}
+
+{% block extra_head %}
+<style>
+    /* Custom scrollbar for filter lists if needed */
+    .scrollbar-hide::-webkit-scrollbar {
+        display: none;
+    }
+
+    .scrollbar-hide {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+    }
+
+    /* Overriding native select chevron for the provided style */
+    select {
+        -webkit-appearance: none !important;
+        -moz-appearance: none !important;
+        appearance: none !important;
+        background-image: none !important;
+        background: transparent !important;
+    }
+
+    select::-ms-expand {
+        display: none;
+    }
+
+    /* Disabled state styles */
+    select:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<main class="flex-1 flex justify-center py-5 px-4 sm:px-8 lg:px-40">
+    <div class="layout-content-container flex flex-col max-w-[1200px] flex-1 w-full">
+        <div class="flex flex-wrap gap-2 p-4 text-sm">
+            <a class="text-slate-500 dark:text-slate-400 font-medium leading-normal hover:text-primary transition-colors"
+                href="{% url 'home' %}">Home</a>
+            <span class="text-slate-500 dark:text-slate-400 font-medium leading-normal">/</span>
+            <a class="text-slate-500 dark:text-slate-400 font-medium leading-normal hover:text-primary transition-colors"
+                href="#">Explore</a>
+            <span class="text-slate-500 dark:text-slate-400 font-medium leading-normal">/</span>
+            <span class="text-slate-900 dark:text-slate-100 font-medium leading-normal">Browse by
+                Location</span>
+        </div>
+        <div class="flex flex-wrap justify-between gap-6 p-4 items-end">
+            <div class="flex flex-col gap-3 max-w-2xl">
+                <h1
+                    class="text-slate-900 dark:text-white text-4xl lg:text-5xl font-black leading-tight tracking-[-0.033em]">
+                    Find Your Future Campus</h1>
+                <p class="text-slate-500 dark:text-slate-400 text-lg font-normal leading-normal">Browse
+                    top-rated institutions by exploring locations below. Select a region to see available
+                    colleges.</p>
+            </div>
+        </div>
+        <form action="{% url 'filter_college' %}" method="GET" class="p-4 mt-4">
+            <input type="hidden" name="q" value="{{ current_filters.q }}">
+            <div
+                class="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 p-6">
+                <div class="flex items-center gap-2 mb-4 text-slate-900 dark:text-white font-bold">
+                    <span class="material-symbols-outlined text-primary">filter_alt</span>
+                    <span>Filter Location</span>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                    <label class="flex flex-col flex-1">
+                        <p class="text-slate-900 dark:text-white text-sm font-medium leading-normal pb-2">
+                            Country</p>
+                        <div class="relative">
+                            <select name="country" id="countrySelect"
+                                class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-slate-900 dark:text-white focus:outline-0 focus:ring-2 focus:ring-primary/20 border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 focus:border-primary h-12 px-4 pr-10 text-base font-normal leading-normal cursor-pointer">
+                                <option value="">All Countries</option>
+                                {% for country in countries %}
+                                <option value="{{ country.id }}" {% if current_filters.country == country.id|stringformat:'s' %}selected{% endif %}>{{ country.name }}</option>
+                                {% endfor %}
+                            </select>
+                            <div class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-500">
+                                <span class="material-symbols-outlined">expand_more</span>
+                            </div>
+                        </div>
+                    </label>
+                    <label class="flex flex-col flex-1">
+                        <p class="text-slate-900 dark:text-white text-sm font-medium leading-normal pb-2">State
+                            / Province</p>
+                        <div class="relative">
+                            <select name="state" id="stateSelect"
+                                class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-slate-900 dark:text-white focus:outline-0 focus:ring-2 focus:ring-primary/20 border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 focus:border-primary h-12 px-4 pr-10 text-base font-normal leading-normal cursor-pointer"
+                                {% if not current_filters.country %}disabled{% endif %}>
+                                <option value="">Select a country first</option>
+                                {% for state in states %}
+                                <option value="{{ state.id }}" {% if current_filters.state == state.id|stringformat:'s' %}selected{% endif %}>{{ state.name }}</option>
+                                {% endfor %}
+                            </select>
+                            <div class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-500">
+                                <span class="material-symbols-outlined">expand_more</span>
+                            </div>
+                        </div>
+                    </label>
+                    <label class="flex flex-col flex-1">
+                        <p class="text-slate-900 dark:text-white text-sm font-medium leading-normal pb-2">City /
+                            District</p>
+                        <div class="relative">
+                            <select name="district" id="districtSelect"
+                                class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-slate-900 dark:text-white focus:outline-0 focus:ring-2 focus:ring-primary/20 border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 focus:border-primary h-12 px-4 pr-10 text-base font-normal leading-normal cursor-pointer"
+                                {% if not current_filters.state %}disabled{% endif %}>
+                                <option value="">Select a state first</option>
+                                {% for district in districts %}
+                                <option value="{{ district.id }}" {% if current_filters.district == district.id|stringformat:'s' %}selected{% endif %}>{{ district.name }}</option>
+                                {% endfor %}
+                            </select>
+                            <div class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-500">
+                                <span class="material-symbols-outlined">expand_more</span>
+                            </div>
+                        </div>
+                    </label>
+                    <div class="flex items-end">
+                        <button type="submit"
+                            class="w-full h-12 bg-primary hover:bg-blue-600 text-white font-bold rounded-lg transition-all flex items-center justify-center gap-2 shadow-sm shadow-blue-500/30">
+                            <span class="material-symbols-outlined text-[20px]">search</span>
+                            <span>Browse Colleges</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </form>
+        <div class="flex flex-col md:flex-row md:items-center justify-between px-4 py-6 gap-4">
+            <h3 class="text-slate-900 dark:text-white text-xl font-bold"></h3>
+            <a href="{% url 'map_search' %}"
+                class="flex items-center gap-1 text-primary text-sm font-bold hover:underline">
+                <span class="material-symbols-outlined text-lg">map</span>
+                Map View
+            </a>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 px-4 pb-10">
+            {% if colleges %}
+            {% for college in colleges %}
+            <div
+                class="group flex flex-col bg-white dark:bg-slate-900 rounded-xl overflow-hidden border border-slate-200 dark:border-slate-800 hover:shadow-lg hover:shadow-primary/5 transition-all duration-300">
+                <div class="relative h-48 w-full overflow-hidden">
+                    {% if college.image %}
+                    <img alt="{{ college.name }}"
+                        class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                        src="{{ college.image.url }}" />
+                    {% elif college.image_url %}
+                    <img alt="{{ college.name }}"
+                        class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                        src="{{ college.image_url }}" />
+                    {% else %}
+                    <div class="h-full w-full bg-slate-200 dark:bg-slate-800 flex items-center justify-center">
+                        <span class="material-symbols-outlined text-4xl text-slate-400">school</span>
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="flex flex-col flex-1 p-5">
+                    <div class="flex flex-col gap-1 mb-3">
+                        <div
+                            class="flex items-center gap-1 text-slate-500 dark:text-slate-400 text-xs font-medium uppercase tracking-wider">
+                            <span>{{ college.get_college_type_display }}</span>
+                        </div>
+                        <h3
+                            class="text-slate-900 dark:text-white text-lg font-bold leading-tight group-hover:text-primary transition-colors">
+                            {{ college.name }}
+                        </h3>
+                        {% if college.university %}
+                        <p class="text-slate-600 dark:text-slate-500 text-sm font-medium">
+                            {{ college.university }}
+                        </p>
+                        {% endif %}
+                        <div class="flex items-center gap-1 text-slate-500 dark:text-slate-400 text-sm mt-1">
+                            <span class="material-symbols-outlined text-[16px]">location_on</span>
+                            {{ college.district.name }}, {{ college.district.state.name }}
+                        </div>
+                    </div>
+                    <div
+                        class="mt-auto pt-4 border-t border-slate-100 dark:border-slate-800 flex justify-between items-center">
+                        <div>
+                            <p class="text-slate-500 dark:text-slate-400 text-xs">Programs</p>
+                            <p class="text-slate-900 dark:text-white text-sm font-bold">{{ college.degrees.count }}</p>
+                        </div>
+                        <div>
+                            <p class="text-slate-500 dark:text-slate-400 text-xs">Type</p>
+                            <p class="text-slate-900 dark:text-white text-sm font-bold">{{ college.get_college_type_display }}</p>
+                        </div>
+                    </div>
+                    <a href="{% url 'college_detail' college.id %}"
+                        class="w-full mt-4 h-10 rounded-lg bg-primary/10 hover:bg-primary text-primary hover:text-white font-bold text-sm transition-colors flex items-center justify-center">
+                        View Details
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+            {% else %}
+            <div class="col-span-full flex flex-col items-center justify-center py-20 text-center">
+                <span
+                    class="material-symbols-outlined text-6xl text-slate-300 dark:text-slate-700 mb-4">search_off</span>
+                <h3 class="text-xl font-bold text-slate-900 dark:text-white">No colleges found</h3>
+                <p class="text-slate-500 dark:text-slate-400 mt-2">Try adjusting your filters or search query.
+                </p>
+                <a href="{% url 'filter_college' %}" class="mt-6 text-primary font-bold hover:underline">Clear
+                    all filters</a>
+            </div>
+            {% endif %}
+            {% if colleges.has_other_pages %}
+            <div class="col-span-full flex items-center justify-center py-6">
+                <div class="flex gap-2">
+                    {% if colleges.has_previous %}
+                    <a href="?page={{ colleges.previous_page_number }}&q={{ current_filters.q }}&country={{ current_filters.country }}&state={{ current_filters.state }}&district={{ current_filters.district }}"
+                        class="w-10 h-10 flex items-center justify-center rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-500 hover:border-primary hover:text-primary transition-colors">
+                        <span class="material-symbols-outlined">chevron_left</span>
+                    </a>
+                    {% endif %}
+
+                    <button
+                        class="w-10 h-10 flex items-center justify-center rounded-lg bg-primary text-white font-bold shadow-md shadow-primary/30">
+                        {{ colleges.number }}
+                    </button>
+
+                    {% if colleges.has_next %}
+                    <a href="?page={{ colleges.next_page_number }}&q={{ current_filters.q }}&country={{ current_filters.country }}&state={{ current_filters.state }}&district={{ current_filters.district }}"
+                        class="w-10 h-10 flex items-center justify-center rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-500 hover:border-primary hover:text-primary transition-colors">
+                        <span class="material-symbols-outlined">chevron_right</span>
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</main>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const countrySelect = document.getElementById('countrySelect');
+    const stateSelect = document.getElementById('stateSelect');
+    const districtSelect = document.getElementById('districtSelect');
+
+    countrySelect.addEventListener('change', function() {
+        const countryId = this.value;
+        
+        stateSelect.innerHTML = '<option value="">Select a state</option>';
+        districtSelect.innerHTML = '<option value="">Select a state first</option>';
+        districtSelect.disabled = true;
+        
+        if (countryId) {
+            fetch(`/api/get-states/?country_id=${countryId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.states.length > 0) {
+                        stateSelect.disabled = false;
+                        data.states.forEach(state => {
+                            const option = document.createElement('option');
+                            option.value = state.id;
+                            option.textContent = state.name;
+                            stateSelect.appendChild(option);
+                        });
+                    } else {
+                        stateSelect.disabled = true;
+                        stateSelect.innerHTML = '<option value="">No states available</option>';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching states:', error);
+                    stateSelect.disabled = true;
+                    stateSelect.innerHTML = '<option value="">Error loading states</option>';
+                });
+        } else {
+            stateSelect.disabled = true;
+            stateSelect.innerHTML = '<option value="">Select a country first</option>';
+        }
+    });
+
+    stateSelect.addEventListener('change', function() {
+        const stateId = this.value;
+        
+        districtSelect.innerHTML = '<option value="">Select a district</option>';
+        
+        if (stateId) {
+            fetch(`/api/get-districts/?state_id=${stateId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.districts.length > 0) {
+                        districtSelect.disabled = false;
+                        data.districts.forEach(district => {
+                            const option = document.createElement('option');
+                            option.value = district.id;
+                            option.textContent = district.name;
+                            districtSelect.appendChild(option);
+                        });
+                    } else {
+                        districtSelect.disabled = true;
+                        districtSelect.innerHTML = '<option value="">No districts available</option>';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching districts:', error);
+                    districtSelect.disabled = true;
+                    districtSelect.innerHTML = '<option value="">Error loading districts</option>';
+                });
+        } else {
+            districtSelect.disabled = true;
+            districtSelect.innerHTML = '<option value="">Select a state first</option>';
+        }
+    });
+});
+</script>
+{% endblock %}

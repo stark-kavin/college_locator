@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Admin Login | CollegeFinder</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&amp;family=Lexend:wght@400;600;700&amp;display=swap"
+        rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#257bf4",
+                        "primary-dark": "#1a5bb5",
+                    },
+                    fontFamily: {
+                        "sans": ["Inter", "sans-serif"],
+                        "display": ["Lexend", "sans-serif"]
+                    },
+                },
+            },
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer base {
+            body {
+                @apply bg-slate-50 text-slate-900;
+            }
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+
+<body class="font-sans antialiased min-h-screen flex items-center justify-center">
+    <div class="w-full max-w-md px-6">
+        <div class="text-center mb-8">
+            <div class="flex items-center justify-center gap-3 mb-4">
+                <div class="bg-primary rounded-lg p-2.5 shadow-lg shadow-primary/20">
+                    <span class="material-symbols-outlined text-white text-3xl">school</span>
+                </div>
+            </div>
+            <h1 class="text-3xl font-bold font-display text-slate-900">CollegeFinder</h1>
+            <p class="text-sm text-slate-500 mt-1 uppercase tracking-widest font-semibold">Admin Panel</p>
+        </div>
+
+        <div class="bg-white rounded-2xl shadow-lg border border-slate-200 p-8">
+            <h2 class="text-xl font-bold text-slate-900 mb-6">Sign In</h2>
+
+            {% if messages %}
+            <div class="mb-6 space-y-2">
+                {% for message in messages %}
+                <div class="{% if message.tags == 'error' %}bg-red-50 text-red-700 border-red-200{% elif message.tags == 'success' %}bg-green-50 text-green-700 border-green-200{% else %}bg-blue-50 text-blue-700 border-blue-200{% endif %} border rounded-lg px-4 py-3 text-sm">
+                    {{ message }}
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <form method="POST" action="{% url 'admin_login' %}{% if request.GET.next %}?next={{ request.GET.next }}{% endif %}" class="space-y-5">
+                {% csrf_token %}
+                
+                <div>
+                    <label for="username" class="block text-sm font-semibold text-slate-700 mb-2">
+                        Username
+                    </label>
+                    <div class="relative">
+                        <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xl">person</span>
+                        <input 
+                            type="text" 
+                            id="username" 
+                            name="username" 
+                            required
+                            autofocus
+                            class="w-full pl-11 pr-4 py-3 rounded-lg border border-slate-300 focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all text-sm"
+                            placeholder="Enter your username"
+                        />
+                    </div>
+                </div>
+
+                <div>
+                    <label for="password" class="block text-sm font-semibold text-slate-700 mb-2">
+                        Password
+                    </label>
+                    <div class="relative">
+                        <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xl">lock</span>
+                        <input 
+                            type="password" 
+                            id="password" 
+                            name="password" 
+                            required
+                            class="w-full pl-11 pr-4 py-3 rounded-lg border border-slate-300 focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all text-sm"
+                            placeholder="Enter your password"
+                        />
+                    </div>
+                </div>
+
+                <button 
+                    type="submit"
+                    class="w-full bg-primary hover:bg-primary-dark text-white font-semibold py-3 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center gap-2"
+                >
+                    <span class="material-symbols-outlined text-xl">login</span>
+                    Sign In
+                </button>
+            </form>
+
+            <div class="mt-6 pt-6 border-t border-slate-200 text-center">
+                <p class="text-xs text-slate-500">
+                    Only authorized staff members can access this area
+                </p>
+            </div>
+        </div>
+
+    </div>
+</body>
+
+</html>

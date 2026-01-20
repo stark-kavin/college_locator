@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+{% load static %}
+<html class="light" lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Districts | CollegeFinder</title>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&amp;family=Lexend:wght@400;600;700&amp;display=swap" rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: { "navy": { "50": "#f8fafc", "100": "#f1f5f9", "200": "#e2e8f0", "300": "#cbd5e1", "400": "#94a3b8", "500": "#64748b", "600": "#475569", "700": "#334155", "800": "#1e293b", "900": "#0f172a", "950": "#020617", }, "edu-primary": "#0f172a", "edu-accent": "#2563eb", },
+                    fontFamily: { "sans": ["Inter", "sans-serif"], "display": ["Lexend", "sans-serif"] },
+                },
+            },
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer base { body { @apply bg-[#fcfcfd] text-navy-900; } }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .nav-item-active { @apply bg-navy-800 text-white; }
+        .nav-item { @apply flex items-center gap-3 px-4 py-3 rounded-lg text-navy-400 hover:text-white hover:bg-navy-800/50 transition-all duration-200; }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { @apply bg-transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { @apply bg-navy-700/20 rounded-full; }
+    </style>
+</head>
+<body class="font-sans antialiased">
+    <div class="flex h-screen overflow-hidden">
+        {% include 'site_admin/partials/sidebar.html' with active='districts' %}
+        <main class="flex-1 flex flex-col overflow-y-auto">
+            <header class="h-20 bg-white border-b border-navy-100 flex items-center justify-between px-10 sticky top-0 z-20">
+                <div class="flex items-center gap-4">
+                    <nav class="flex items-center gap-2 text-sm">
+                        <a class="text-navy-400 hover:text-navy-900 transition-colors" href="{% url 'admin_dashboard' %}">Home</a>
+                        <span class="material-symbols-outlined text-navy-300 text-sm">chevron_right</span>
+                        <span class="font-semibold text-navy-900">Districts</span>
+                    </nav>
+                </div>
+                <div class="flex items-center gap-3">
+                    <a href="{% url 'create_district' %}" class="bg-navy-900 text-white text-sm font-semibold h-10 px-5 rounded-lg flex items-center gap-2 hover:bg-navy-800 transition-all active:scale-95 shadow-lg shadow-navy-900/10">
+                        <span class="material-symbols-outlined text-[20px]">add</span>
+                        Add District
+                    </a>
+                </div>
+            </header>
+            <div class="px-10 py-8 max-w-7xl">
+                <div class="mb-10">
+                    <h2 class="text-2xl font-bold text-navy-950 font-display">Districts</h2>
+                    <p class="text-navy-500 text-sm mt-1">Manage districts in the system.</p>
+                </div>
+                <div class="bg-white rounded-2xl border border-navy-100 shadow-sm mb-8 overflow-hidden">
+                    <div class="p-5 flex items-center gap-4">
+                        <div class="relative flex-1 max-w-lg">
+                            <form method="get" class="w-full">
+                                <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-navy-400">search</span>
+                                <input name="search" value="{{ search_query }}" class="w-full bg-navy-50/50 border-navy-100 rounded-xl py-2.5 pl-11 pr-4 focus:ring-2 focus:ring-edu-accent/10 focus:border-edu-accent outline-none text-sm transition-all placeholder:text-navy-400" placeholder="Search districts..." type="text" />
+                            </form>
+                        </div>
+                        <select name="state" onchange="applyFilter()" id="stateFilter" class="px-4 py-2.5 text-xs font-semibold text-navy-600 bg-navy-50/80 border border-navy-100 rounded-xl outline-none cursor-pointer">
+                            <option value="">All States</option>
+                            {% for state in states %}
+                            <option value="{{ state.id }}" {% if state_filter == state.id|stringformat:"s" %}selected{% endif %}>{{ state.name }}, {{ state.country.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-navy-50/50 border-y border-navy-100">
+                                    <th class="px-6 py-4 text-[11px] font-bold text-navy-500 uppercase tracking-widest">District Name</th>
+                                    <th class="px-6 py-4 text-[11px] font-bold text-navy-500 uppercase tracking-widest">State</th>
+                                    <th class="px-6 py-4 text-[11px] font-bold text-navy-500 uppercase tracking-widest">Colleges</th>
+                                    <th class="px-6 py-4 text-[11px] font-bold text-navy-500 uppercase tracking-widest text-right">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-navy-50">
+                                {% for district in page_obj %}
+                                <tr class="hover:bg-navy-50/30 transition-colors group">
+                                    <td class="px-6 py-5">
+                                        <div class="flex items-center gap-3">
+                                            <div class="size-10 bg-amber-100 rounded-lg flex items-center justify-center text-amber-700 shadow-sm">
+                                                <span class="material-symbols-outlined text-[20px]">location_city</span>
+                                            </div>
+                                            <div>
+                                                <p class="text-sm font-semibold text-navy-950">{{ district.name }}</p>
+                                                <p class="text-[11px] text-navy-400 font-mono">#DS-{{ district.id|stringformat:"05d" }}</p>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-5 text-sm text-navy-600 font-medium">{{ district.state.name }}, {{ district.state.country.name }}</td>
+                                    <td class="px-6 py-5">
+                                        <span class="text-sm text-navy-600 font-medium">{{ district.college_count }} college{{ district.college_count|pluralize }}</span>
+                                    </td>
+                                    <td class="px-6 py-5 text-right">
+                                        <div class="flex items-center justify-end gap-1">
+                                            <a href="{% url 'edit_district' district.pk %}" class="p-1.5 text-navy-400 hover:text-navy-900 hover:bg-navy-100 rounded transition-all">
+                                                <span class="material-symbols-outlined text-[20px]">edit</span>
+                                            </a>
+                                            <form method="post" action="{% url 'delete_district' district.pk %}" style="display: inline;" onsubmit="return confirm('Are you sure you want to delete {{ district.name }}?');">
+                                                {% csrf_token %}
+                                                <button type="submit" class="p-1.5 text-navy-400 hover:text-red-600 hover:bg-red-50 rounded transition-all">
+                                                    <span class="material-symbols-outlined text-[20px]">delete</span>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="4" class="px-6 py-12 text-center">
+                                        <div class="flex flex-col items-center justify-center text-navy-400">
+                                            <span class="material-symbols-outlined text-5xl mb-3">search_off</span>
+                                            <p class="text-sm font-medium">No districts found</p>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="bg-navy-50/30 px-6 py-4 flex items-center justify-between border-t border-navy-100">
+                        <p class="text-xs text-navy-500 font-medium uppercase tracking-tight">Displaying <span class="text-navy-950 font-bold">{{ page_obj.start_index }} - {{ page_obj.end_index }}</span> of <span class="text-navy-950 font-bold">{{ page_obj.paginator.count }}</span> records</p>
+                        <div class="flex items-center gap-1">
+                            {% if page_obj.has_previous %}
+                            <a href="?page={{ page_obj.previous_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if state_filter %}&state={{ state_filter }}{% endif %}" class="size-8 flex items-center justify-center rounded-lg text-navy-400 hover:bg-navy-100 transition-colors"><span class="material-symbols-outlined text-[20px]">chevron_left</span></a>
+                            {% endif %}
+                            {% for num in page_obj.paginator.page_range %}
+                                {% if page_obj.number == num %}
+                                <span class="size-8 flex items-center justify-center rounded-lg bg-navy-900 text-white text-xs font-bold shadow-sm">{{ num }}</span>
+                                {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                                <a href="?page={{ num }}{% if search_query %}&search={{ search_query }}{% endif %}{% if state_filter %}&state={{ state_filter }}{% endif %}" class="size-8 flex items-center justify-center rounded-lg text-navy-600 hover:bg-navy-100 text-xs font-bold transition-colors">{{ num }}</a>
+                                {% endif %}
+                            {% endfor %}
+                            {% if page_obj.has_next %}
+                            <a href="?page={{ page_obj.next_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if state_filter %}&state={{ state_filter }}{% endif %}" class="size-8 flex items-center justify-center rounded-lg text-navy-400 hover:bg-navy-100 transition-colors"><span class="material-symbols-outlined text-[20px]">chevron_right</span></a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    {% if messages %}
+    <div class="fixed top-4 right-4 z-50 space-y-2">
+        {% for message in messages %}
+        <div class="bg-white border-l-4 {% if message.tags == 'success' %}border-emerald-500{% elif message.tags == 'error' %}border-red-500{% else %}border-blue-500{% endif %} rounded-lg shadow-lg p-4 max-w-md">
+            <div class="flex items-start gap-3">
+                <span class="material-symbols-outlined {% if message.tags == 'success' %}text-emerald-500{% elif message.tags == 'error' %}text-red-500{% else %}text-blue-500{% endif %}">{% if message.tags == 'success' %}check_circle{% elif message.tags == 'error' %}error{% else %}info{% endif %}</span>
+                <div class="flex-1"><p class="text-sm font-semibold text-slate-900">{{ message }}</p></div>
+                <button onclick="this.parentElement.parentElement.remove()" class="text-slate-400 hover:text-slate-600"><span class="material-symbols-outlined text-[20px]">close</span></button>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    <script>
+        function applyFilter() {
+            const searchParams = new URLSearchParams(window.location.search);
+            const stateFilter = document.getElementById('stateFilter').value;
+            if (stateFilter) { searchParams.set('state', stateFilter); } else { searchParams.delete('state'); }
+            searchParams.delete('page');
+            window.location.search = searchParams.toString();
+        }
+    </script>
+</body>
+</html>

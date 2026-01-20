@@ -1,0 +1,282 @@
+{% extends 'public/base.html' %}
+
+{% block title %}{{ college.name }} | CollegeFinder{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.css" />
+<script src="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.js"></script>
+<style type="text/tailwindcss">
+    .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+    }
+</style>
+<script>
+    tailwind.config = {
+        darkMode: "class",
+        theme: {
+            extend: {
+                colors: {
+                    "primary": "#257bf4",
+                    "background-light": "#f5f7f8",
+                    "background-dark": "#101722",
+                    "accent-gold": "#D4AF37",
+                    "navy-slate": "#1E293B",
+                },
+                borderRadius: {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+                },
+            },
+        },
+    }
+</script>
+{% endblock %}
+
+{% block content %}
+<main class="max-w-[1200px] mx-auto pb-20 px-4 w-full">
+    <div class="mt-6 @container">
+        <div class="relative min-h-[520px] rounded-xl overflow-hidden shadow-2xl">
+            <div class="absolute inset-0 bg-cover bg-center" data-alt="{{ college.name }} campus"
+                style='background-image: linear-gradient(to bottom, rgba(16, 23, 34, 0.2), rgba(16, 23, 34, 0.8)), url("{% if college.image %}{{ college.image.url }}{% elif college.image_url %}{{ college.image_url }}{% else %}https://lh3.googleusercontent.com/aida-public/AB6AXuD62A-X997UBW8f40TOt0YVNwwV7J3wnwfwTZ8yp-tHYVt7b1Dm85n_jwnLJZACJ-0yq1Hw2Ghf7DVxoIekY-zW-rT0xjvhWsZG-I8DEedzD4wJD0HhXu2WdU7xr3zbbEJrl5s_4ZCT_nrtBGC7KSxkOrI19ecM0O1M-kY_lt0h3ztltbF6KLvcAI3F8u9nM9w4wF7NMtCn2uRY7PZDcd18zUEJvRL3QT5iEYELI-dGOhwvcMszmxSlvxaMW5tNe7025wfiyTFMrQ{% endif %}");'>
+            </div>
+            <div
+                class="absolute bottom-0 left-0 right-0 p-8 md:p-12 flex flex-col md:flex-row md:items-end justify-between gap-6">
+                <div class="flex flex-col gap-4 max-w-2xl">
+                    <div
+                        class="inline-flex items-center gap-2 bg-accent-gold/90 text-navy-slate px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">
+                        <span class="material-symbols-outlined text-xs">verified</span>
+                        {{ college.get_college_type_display }}
+                    </div>
+                    <h1 class="text-white text-4xl md:text-6xl font-black leading-tight tracking-tight">
+                        {{ college.name }}
+                    </h1>
+                    {% if college.university %}
+                    <p class="text-slate-300 text-base md:text-lg font-medium">
+                        {{ college.university }}
+                    </p>
+                    {% endif %}
+                    <p class="text-slate-200 text-lg md:text-xl font-light">
+                        {{ college.district.name }}, {{ college.district.state.name }}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6">
+        {% if college.website %}
+        <a href="{{ college.website }}" target="_blank"
+            class="flex items-center gap-4 bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm transition-hover hover:shadow-md cursor-pointer">
+            <div class="bg-primary/10 text-primary p-3 rounded-lg">
+                <span class="material-symbols-outlined">public</span>
+            </div>
+            <div class="flex flex-col">
+                <h3 class="text-slate-400 text-xs font-semibold uppercase tracking-wider">Official Website</h3>
+                <p class="text-navy-slate dark:text-white font-bold truncate max-w-[200px]">Visit Website</p>
+            </div>
+        </a>
+        {% endif %}
+
+        {% if college.email %}
+        <div
+            class="flex items-center gap-4 bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm transition-hover hover:shadow-md">
+            <div class="bg-primary/10 text-primary p-3 rounded-lg">
+                <span class="material-symbols-outlined">alternate_email</span>
+            </div>
+            <div class="flex flex-col">
+                <h3 class="text-slate-400 text-xs font-semibold uppercase tracking-wider">Email</h3>
+                <p class="text-navy-slate dark:text-white font-bold truncate max-w-[200px]">{{ college.email }}</p>
+            </div>
+        </div>
+        {% endif %}
+
+        {% if college.phone_number %}
+        <div
+            class="flex items-center gap-4 bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm transition-hover hover:shadow-md">
+            <div class="bg-primary/10 text-primary p-3 rounded-lg">
+                <span class="material-symbols-outlined">call</span>
+            </div>
+            <div class="flex flex-col">
+                <h3 class="text-slate-400 text-xs font-semibold uppercase tracking-wider">Phone</h3>
+                <p class="text-navy-slate dark:text-white font-bold">{{ college.phone_number }}</p>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+    <div class="mt-12 grid grid-cols-1 lg:grid-cols-3 gap-12">
+        <div class="lg:col-span-2 space-y-16">
+            <div>
+                <h2 class="text-navy-slate dark:text-white text-2xl font-bold mb-6 flex items-center gap-2">
+                    <span class="material-symbols-outlined text-primary">location_on</span> Campus Location
+                </h2>
+                <div
+                    class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden">
+                    {% if college.university %}
+                    <div class="p-6 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center">
+                        <span class="text-slate-500 text-sm font-light">University</span>
+                        <span class="text-navy-slate dark:text-slate-200 font-medium text-right max-w-[60%]">{{ college.university }}</span>
+                    </div>
+                    {% endif %}
+                    <div class="p-6 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center">
+                        <span class="text-slate-500 text-sm font-light">Address</span>
+                        <span class="text-navy-slate dark:text-slate-200 font-medium text-right max-w-[60%]">{{ college.address_line }}</span>
+                    </div>
+                    <div class="p-6 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center">
+                        <span class="text-slate-500 text-sm font-light">Pincode</span>
+                        <span class="text-navy-slate dark:text-slate-200 font-medium">{{ college.pincode }}</span>
+                    </div>
+                    {% if college.latitude and college.longitude %}
+                    <div class="p-6 flex justify-between items-center">
+                        <span class="text-slate-500 text-sm font-light">Coordinates</span>
+                        <span class="text-navy-slate dark:text-slate-200 font-medium">{{ college.latitude }}, {{ college.longitude }}</span>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            <div>
+                <div class="flex items-center justify-between mb-8">
+                    <h2 class="text-navy-slate dark:text-white text-2xl font-bold flex items-center gap-3">
+                        <span class="material-symbols-outlined text-primary text-3xl">workspace_premium</span>
+                        Offered Programs
+                    </h2>
+                    <span class="text-slate-400 text-sm font-medium">{{ college.degrees.count }} Programs
+                        Available</span>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {% for degree in college.degrees.all %}
+                    <div
+                        class="group bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-5 rounded-2xl flex items-start gap-4 hover:border-primary/40 hover:shadow-lg hover:shadow-primary/5 transition-all cursor-pointer">
+                        <div
+                            class="w-12 h-12 flex-shrink-0 bg-slate-50 dark:bg-slate-800 rounded-xl flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-colors">
+                            <span class="material-symbols-outlined">school</span>
+                        </div>
+                        <div class="flex-grow">
+                            <h4 class="text-navy-slate dark:text-white font-bold text-sm mb-1">{{ degree.name }}
+                            </h4>
+                            <p
+                                class="text-slate-500 dark:text-slate-400 text-xs font-light tracking-wide flex items-center gap-1.5">
+                                <span class="material-symbols-outlined text-[14px]">schedule</span> {{ degree.duration_years }} Years Duration
+                            </p>
+                        </div>
+                        <span
+                            class="material-symbols-outlined text-slate-300 group-hover:text-primary transition-colors">chevron_right</span>
+                    </div>
+                    {% empty %}
+                    <div class="col-span-full py-10 text-center text-slate-500">
+                        No degrees listed for this college yet.
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        <div class="lg:col-span-1">
+            <div class="sticky top-28 space-y-6">
+                <div
+                    class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-2 shadow-xl overflow-hidden">
+                    <div id="college-map" class="h-64 md:h-80 w-full rounded-lg relative bg-slate-200 overflow-hidden z-[0]">
+                    </div>
+                    {% if college.latitude and college.longitude %}
+                    <script>
+                        document.addEventListener('DOMContentLoaded', function() {
+                            var map = L.map('college-map').setView([{{ college.latitude }}, {{ college.longitude }}], 15);
+                            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                            }).addTo(map);
+                            
+                            var collegeMarker = L.marker([{{ college.latitude }}, {{ college.longitude }}]).addTo(map)
+                                .bindPopup('{{ college.name }}')
+                                .openPopup();
+                            
+                            var userMarker = null;
+                            var routingControl = null;
+                            
+                            window.useMyLocation = function() {
+                                if (navigator.geolocation) {
+                                    document.getElementById('location-btn').innerHTML = '<span class="material-symbols-outlined text-lg animate-spin">progress_activity</span> Getting Location...';
+                                    document.getElementById('location-btn').disabled = true;
+                                    
+                                    navigator.geolocation.getCurrentPosition(function(position) {
+                                        var userLat = position.coords.latitude;
+                                        var userLng = position.coords.longitude;
+                                        
+                                        if (userMarker) {
+                                            map.removeLayer(userMarker);
+                                        }
+                                        
+                                        if (routingControl) {
+                                            map.removeControl(routingControl);
+                                        }
+                                        
+                                        userMarker = L.marker([userLat, userLng], {
+                                            icon: L.icon({
+                                                iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-blue.png',
+                                                shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+                                                iconSize: [25, 41],
+                                                iconAnchor: [12, 41],
+                                                popupAnchor: [1, -34],
+                                                shadowSize: [41, 41]
+                                            })
+                                        }).addTo(map)
+                                            .bindPopup('Your Location');
+                                        
+                                        routingControl = L.Routing.control({
+                                            waypoints: [
+                                                L.latLng(userLat, userLng),
+                                                L.latLng({{ college.latitude }}, {{ college.longitude }})
+                                            ],
+                                            routeWhileDragging: false,
+                                            showAlternatives: false,
+                                            lineOptions: {
+                                                styles: [{color: '#257bf4', opacity: 0.8, weight: 5}]
+                                            },
+                                            createMarker: function() { return null; }, // Don't create default markers
+                                            addWaypoints: false
+                                        }).addTo(map);
+                                        
+                                        var bounds = L.latLngBounds([
+                                            [userLat, userLng],
+                                            [{{ college.latitude }}, {{ college.longitude }}]
+                                        ]);
+                                        map.fitBounds(bounds, { padding: [50, 50] });
+                                        
+                                        document.getElementById('location-btn').innerHTML = '<span class="material-symbols-outlined text-lg">my_location</span> Location Found';
+                                        document.getElementById('location-btn').disabled = false;
+                                    }, function(error) {
+                                        alert('Unable to retrieve your location. Please enable location services.');
+                                        document.getElementById('location-btn').innerHTML = '<span class="material-symbols-outlined text-lg">my_location</span> Use My Location';
+                                        document.getElementById('location-btn').disabled = false;
+                                    });
+                                } else {
+                                    alert('Geolocation is not supported by your browser.');
+                                }
+                            };
+                        });
+                    </script>
+                    {% else %}
+                    <div class="h-64 md:h-80 w-full rounded-lg relative bg-slate-200 overflow-hidden flex items-center justify-center">
+                        <p class="text-slate-500">Location map not available</p>
+                    </div>
+                    {% endif %}
+                    <div class="p-4 flex flex-col gap-4">
+                        <h3 class="text-navy-slate dark:text-white font-bold text-lg">Interactive Map</h3>
+                        <p class="text-slate-500 text-sm leading-relaxed font-light">Located in the heart of
+                            {{ college.district.name }}, this institution provides excellent facilities.</p>
+                        <button id="location-btn" onclick="useMyLocation()"
+                            class="w-full bg-primary text-white py-3 rounded-xl text-sm font-bold flex items-center justify-center gap-2 hover:bg-primary/90 transition-all">
+                            <span class="material-symbols-outlined text-lg">my_location</span> Use My Location
+                        </button>
+                        <a href="https://www.google.com/maps/dir/?api=1&destination={{ college.latitude }},{{ college.longitude }}" target="_blank"
+                            class="w-full border border-slate-200 dark:border-slate-700 py-3 rounded-xl text-sm font-bold flex items-center justify-center gap-2 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all text-navy-slate dark:text-white">
+                            <span class="material-symbols-outlined text-lg">directions</span> Get Directions
+                        </a>
+                    </div>
+                </div>
+                {% comment %} Rankings section removed as no data is available {% endcomment %}
+            </div>
+        </div>
+    </div>
+</main>
+{% endblock %}
